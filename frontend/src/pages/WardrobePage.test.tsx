@@ -158,6 +158,39 @@ describe('WardrobePage', () => {
     );
   });
 
+  it('edits an item via the form and updates the card', async () => {
+    const updated = { ...sampleItem, name: 'Bluse (geändert)' };
+    mockApiFetch
+      .mockResolvedValueOnce([sampleItem])
+      .mockResolvedValueOnce(updated);
+    renderWardrobe();
+    await waitFor(() => expect(screen.getByText('Bluse')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: 'Bearbeiten' }));
+
+    const nameInput = screen.getByLabelText('Name') as HTMLInputElement;
+    expect(nameInput.value).toBe('Bluse');
+    expect((screen.getByLabelText('Farbe') as HTMLInputElement).value).toBe(
+      'Weiß',
+    );
+    expect((screen.getByLabelText('Kategorie') as HTMLSelectElement).value).toBe(
+      'Oberteile',
+    );
+
+    fireEvent.change(nameInput, { target: { value: 'Bluse (geändert)' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Speichern' }));
+
+    await waitFor(() =>
+      expect(mockApiFetch).toHaveBeenCalledWith('/api/wardrobe/items/1', {
+        method: 'PUT',
+        body: expect.objectContaining({ name: 'Bluse (geändert)' }),
+      }),
+    );
+    await waitFor(() =>
+      expect(screen.getByText('Bluse (geändert)')).toBeInTheDocument(),
+    );
+  });
+
   it('deletes an item after confirmation', async () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     mockApiFetch.mockResolvedValue([sampleItem]);
