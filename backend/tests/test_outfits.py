@@ -118,7 +118,7 @@ def test_get_outfit():
 
 
 def test_delete_outfit():
-    user = _create_user("delete@example.com")
+    user = _create_user("delete-outfit@example.com")
     outfit = _create_outfit(user.id, "Weg", [])
 
     with TestClient(app) as client:
