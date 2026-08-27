@@ -20,6 +20,9 @@ venv/
 .idea/
 .vscode/
 
+# JWT secret (generated at runtime, must never be committed)
+.jwt_secret
+
 # OS
 .DS_Store
 Thumbs.db

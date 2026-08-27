@@ -7,8 +7,12 @@ ever carrying a literal value in the repo.
 
 import os
 import secrets
+from contextlib import suppress
+from pathlib import Path
 
 _jwt_secret: str | None = None
+
+_SECRET_FILE = Path(__file__).resolve().parent.parent / ".jwt_secret"
 
 
 def get_database_url() -> str:
@@ -18,8 +22,24 @@ def get_database_url() -> str:
 def get_jwt_secret() -> str:
     global _jwt_secret
     if _jwt_secret is None:
-        _jwt_secret = os.environ.get("JWT_SECRET") or secrets.token_hex(32)
+        _jwt_secret = _load_or_create_jwt_secret()
     return _jwt_secret
+
+
+def _load_or_create_jwt_secret() -> str:
+    env_secret = os.environ.get("JWT_SECRET")
+    if env_secret:
+        return env_secret
+    try:
+        existing = _SECRET_FILE.read_text(encoding="utf-8").strip()
+        if existing:
+            return existing
+    except (FileNotFoundError, OSError):
+        pass
+    generated = secrets.token_hex(32)
+    with suppress(OSError):
+        _SECRET_FILE.write_text(generated, encoding="utf-8")
+    return generated
 
 
 def get_jwt_expires_minutes() -> int:
