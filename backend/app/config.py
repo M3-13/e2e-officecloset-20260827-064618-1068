@@ -1,8 +1,9 @@
 """Application configuration, read lazily from the environment.
 
 Every value has a working default so that a freshly cloned repository starts
-without manual setup. Secrets are generated per-process when absent rather than
-ever carrying a literal value in the repo.
+without manual setup. The JWT secret is generated once and persisted to a file
+when absent, so it survives process restarts rather than ever carrying a literal
+value in the repo.
 """
 
 import os
