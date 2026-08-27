@@ -127,7 +127,7 @@ def test_update_item(client):
 
 
 def test_delete_item(client):
-    user = _create_user("delete@example.com")
+    user = _create_user("delete-item@example.com")
     created = _create_item(client, user.id)
 
     resp = client.delete(f"/api/wardrobe/items/{created['id']}", headers=_auth_headers(user.id))
